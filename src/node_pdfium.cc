@@ -1,5 +1,7 @@
 #include <node.h>
 
+#include <limits.h>
+
 #include "node_pdfium.hh"
 
 #include <uv.h>
