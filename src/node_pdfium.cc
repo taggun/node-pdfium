@@ -507,11 +507,11 @@ void EncodePagesResult(const std::vector<std::string>& iResult, v8::Handle<v8::A
   int i = 0;
   
   v8::Isolate* Isolate = v8::Isolate::GetCurrent();
-  v8::EscapableHandleScope HandleScope(Isolate);
   
   for(std::vector<std::string>::const_iterator it = iResult.begin(); it != iResult.end(); ++it) {
     //v8::Local<v8::Value> data = node::Buffer::New(MY_NODE_MODULE_ISOLATE_PRE it->c_str(), (int)it->size());
-	v8::Local<v8::Value> data = HandleScope.Escape(node::Buffer::Copy(Isolate, it->c_str(), it->size()).ToLocalChecked());
+    v8::EscapableHandleScope HandleScope(Isolate);
+	  v8::Local<v8::Value> data = HandleScope.Escape(node::Buffer::Copy(Isolate, it->c_str(), it->size()).ToLocalChecked());
     oResult->Set(i++, data);
   }
 }
