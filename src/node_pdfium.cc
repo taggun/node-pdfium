@@ -520,7 +520,7 @@ void RenderAsyncAfter(uv_work_t *r) {
   MY_NODE_MODULE_HANDLESCOPE;
   RenderAsyncReq* req = reinterpret_cast<RenderAsyncReq*>(r->data);
 
-  v8::TryCatch try_catch;
+  v8::TryCatch try_catch(v8::Isolate::GetCurrent());
 
   v8::Local<v8::Function> callback = v8::Local<v8::Function>::New(MY_NODE_MODULE_ISOLATE_PRE req->callback);
   if(!req->error.empty()) {
@@ -569,11 +569,13 @@ MY_NODE_MODULE_CALLBACK(render)
   REQUIRE_ARGUMENT_OBJECT(iArgs, 0, options);
   OPTIONAL_ARGUMENT_FUNCTION(iArgs, 1, callback);
 
-  if(!options->HasOwnProperty(V8_STRING_NEW_UTF8("data"))) {
+  if(!options->HasRealNamedProperty(V8_STRING_NEW_UTF8("data"))) {
+  //if(!Nan::HasOwnProperty(options, V8_STRING_NEW_UTF8("data"))) {
     RETURN_EXCEPTION_STR_CB("data field is missing", callback);
   }
 
-  if(!options->HasOwnProperty(V8_STRING_NEW_UTF8("outputFormat"))) {
+  if(!options->HasRealNamedProperty(V8_STRING_NEW_UTF8("outputFormat"))) {
+  //if(!Nan::HasOwnProperty(options, V8_STRING_NEW_UTF8("outputFormat"))) {
     RETURN_EXCEPTION_STR_CB("outputFormat field is missing", callback);
   }
 
@@ -593,7 +595,8 @@ MY_NODE_MODULE_CALLBACK(render)
 
   req->outputFormat.assign(*outputFormatObject, outputFormatObject.length());
 
-  if(options->HasOwnProperty(V8_STRING_NEW_UTF8("scaleFactor"))) {
+  if(options->HasRealNamedProperty(V8_STRING_NEW_UTF8("scaleFactor"))) {
+  //if(!Nan::HasOwnProperty(options, V8_STRING_NEW_UTF8("scaleFactor"))) {
     v8::Local<v8::Value> scaleFactor = options->Get(V8_STRING_NEW_UTF8("scaleFactor")).As<v8::Value>();
     if(!scaleFactor->IsNumber()) {
       RETURN_EXCEPTION_STR_CB("scaleFactor should be a Number", callback);

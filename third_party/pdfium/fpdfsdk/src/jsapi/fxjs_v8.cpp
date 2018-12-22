@@ -321,7 +321,7 @@ int JS_Parse(IJS_Runtime* pJSRuntime, IFXJS_Context* pJSContext, const wchar_t* 
 {
 	v8::Isolate* isolate = (v8::Isolate*)pJSRuntime;
 	v8::Isolate::Scope isolate_scope(isolate);
-	v8::TryCatch try_catch;
+	v8::TryCatch try_catch(isolate);
 
 	CFX_WideString wsScript(script);
 	CFX_ByteString bsScript = wsScript.UTF8Encode();
@@ -339,7 +339,7 @@ int JS_Execute(IJS_Runtime* pJSRuntime, IFXJS_Context* pJSContext, const wchar_t
 {
 	v8::Isolate* isolate = (v8::Isolate*)pJSRuntime;
 	v8::Isolate::Scope isolate_scope(isolate);
-	v8::TryCatch try_catch;
+	v8::TryCatch try_catch(isolate);
 
 	CFX_WideString wsScript(script);
 	CFX_ByteString bsScript = wsScript.UTF8Encode();
@@ -709,7 +709,7 @@ v8::Handle<v8::Value> JS_GetListValue(v8::Handle<v8::Value> pList, int index)
 int	JS_ToInt32(v8::Handle<v8::Value> pValue)
 {
 	if(pValue.IsEmpty()) return 0;
-	return pValue->ToInt32()->Value();
+	return pValue->ToInt32(v8::Isolate::GetCurrent())->Value();
 }
 
 bool JS_ToBoolean(v8::Handle<v8::Value> pValue)
@@ -721,7 +721,7 @@ bool JS_ToBoolean(v8::Handle<v8::Value> pValue)
 double JS_ToNumber(v8::Handle<v8::Value> pValue)
 {
 	if(pValue.IsEmpty()) return 0.0;
-	return pValue->ToNumber()->Value();
+	return pValue->ToNumber(v8::Isolate::GetCurrent())->Value();
 }
 
 v8::Handle<v8::Object> JS_ToObject(v8::Handle<v8::Value> pValue)
@@ -989,7 +989,7 @@ double JS_DateParse(const wchar_t* string)
 			v = funC->Call(context->Global(), argc, argv);
 			if(v->IsNumber())
 			{
-				double date =  v->ToNumber()->Value();
+				double date =  v->ToNumber(v8::Isolate::GetCurrent())->Value();
 				if(!_isfinite(date)) return date;
 				return date + _getLocalTZA() + _getDaylightSavingTA(date);
 			}
