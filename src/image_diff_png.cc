@@ -17,8 +17,8 @@
 #include <string>
 
 #include "../third_party/pdfium/third_party/base/logging.h"
-#include "../third_party/pdfium/core/src/fxcodec/fx_zlib/include/fx_zlib.h"
-#include "../third_party/fx_lpng/include/fx_png.h"
+#include "../third_party/pdfium/third_party/zlib_v128//zlib.h"
+#include "../third_party/pdfium/third_party/libpng16/png.h"
 
 namespace image_diff_png {
 
