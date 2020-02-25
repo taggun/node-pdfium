@@ -4,7 +4,7 @@
 
 {
   'variables': {
-    'chromium_code': 1,
+    'chromium_code': 0,
     'pdf_use_skia%': 0,
     'pdf_enable_v8%': 1,
     'libjpeg_gyp_path': 'third_party/third_party.gyp',
@@ -23,6 +23,7 @@
   },
   'target_defaults': {
     'defines' : [
+    '_FPDFSDK_LIB',
       'OPJ_STATIC',
       'PNG_PREFIX',
       'PNG_USE_READ_MACROS',
@@ -49,7 +50,10 @@
         'conditions': [
           ['target_arch=="x64"', {
             'defines' : [ '_FX_CPU_=_FX_X64_', ],
-            'cflags': [ '-fPIC', ],
+            'cflags': [ '-fPIC', '-fdata-sections',
+                                                   '-ffunction-sections',
+                                                   '-O3',
+                                                   '-O2', ],
           }],
           ['target_arch=="ia32"', {
             'defines' : [ '_FX_CPU_=_FX_X86_', ],
@@ -798,6 +802,8 @@
             "core/fxge/ifx_renderdevicedriver.h",
             "core/fxge/ifx_systemfontinfo.h",
             "core/fxge/win32/cfx_windowsdib.h",
+            "core/fxge/agg/fx_agg_driver.cpp",
+            "core/fxge/agg/fx_agg_driver.h",
       ],
       'variables': {
         'clang_warning_flags': [
@@ -815,7 +821,7 @@
             'core/fxge/agg/fx_agg_driver.cpp',
           ],
           'dependencies': [
-            '<(DEPTH)/skia/skia.gyp:skia',
+            'skia/skia.gyp:skia',
           ],
           'dependencies!': [
             'third_party/third_party.gyp:fx_agg',
