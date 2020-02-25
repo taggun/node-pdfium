@@ -845,6 +845,14 @@
                   "core/fxge/win32/win32_int.h",
           ],
         }],
+        ['OS=="mac"', {
+        'sources': [
+           "core/fxge/apple/fx_apple_platform.cpp",
+           "core/fxge/apple/apple_int.h",
+           "core/fxge/apple/fx_mac_imp.cpp",
+           "core/fxge/apple/fx_quartz_device.cpp",
+        ],
+        }]
       ],
     },
     {
