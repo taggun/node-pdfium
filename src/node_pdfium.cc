@@ -13,12 +13,12 @@
 #include <utility>
 #include <sstream>
 
-#include "../third_party/pdfium/fpdfsdk/include/fpdf_dataavail.h"
-#include "../third_party/pdfium/fpdfsdk/include/fpdf_ext.h"
-#include "../third_party/pdfium/fpdfsdk/include/fpdfformfill.h"
-#include "../third_party/pdfium/fpdfsdk/include/fpdftext.h"
-#include "../third_party/pdfium/fpdfsdk/include/fpdfview.h"
-#include "../third_party/pdfium/core/include/fxcrt/fx_system.h"
+#include "../third_party/pdfium/public/fpdf_dataavail.h"
+#include "../third_party/pdfium/public/fpdf_ext.h"
+#include "../third_party/pdfium/public/fpdf_formfill.h"
+#include "../third_party/pdfium/public/fpdf_text.h"
+#include "../third_party/pdfium/public/fpdfview.h"
+#include "../third_party/pdfium/core/fxcrt/fx_system.h"
 
 #include "image_diff_png.hh"
 
@@ -110,7 +110,7 @@ int Get_Block(void* param, unsigned long pos, unsigned char* pBuf,
   return 1;
 }
 
-bool Is_Data_Avail(FX_FILEAVAIL* pThis, size_t offset, size_t size) {
+FPDF_BOOL Is_Data_Avail(FX_FILEAVAIL* pThis, size_t offset, size_t size) {
   return true;
 }
 
@@ -502,7 +502,7 @@ void RenderAsync(uv_work_t *r) {
   //req->error = "Not implemented yet";
 }
 
-void EncodePagesResult(const std::vector<std::string>& iResult, v8::Handle<v8::Array> oResult) {
+void EncodePagesResult(const std::vector<std::string>& iResult, v8::Local<v8::Array> oResult) {
   MY_NODE_MODULE_ISOLATE_DECL;
   int i = 0;
   
@@ -524,19 +524,20 @@ void RenderAsyncAfter(uv_work_t *r) {
 
   v8::Local<v8::Function> callback = v8::Local<v8::Function>::New(MY_NODE_MODULE_ISOLATE_PRE req->callback);
   if(!req->error.empty()) {
-    v8::Handle<v8::Value> argv[1] = {v8::Exception::TypeError(V8_STRING_NEW_UTF8(req->error.c_str()))};
+    v8::Local<v8::Value> argv[1] = {v8::Exception::TypeError(V8_STRING_NEW_UTF8(req->error.c_str()))};
 
-    callback->Call(MY_NODE_MODULE_CONTEXT, 1, argv);
+//cannot convert ‘v8::Object*’ to ‘v8::Context* volatile’ in assignment
+    callback->Call(isolate->GetCurrentContext(), argv[1], 1, argv);
   } else {
     v8::Local<v8::Array> result = V8_VALUE_NEW_DEFAULT_V_0_11_10(Array);
     EncodePagesResult(req->result, result);
 
-    v8::Handle<v8::Value> argv[2] = {
+    v8::Local<v8::Value> argv[2] = {
       v8::Null(MY_NODE_MODULE_ISOLATE),
       result
     };
 
-    callback->Call(MY_NODE_MODULE_CONTEXT, 2, argv);
+    callback->Call(isolate->GetCurrentContext(), argv[2], 2, argv);
   }
 
   // cleanup
@@ -544,7 +545,7 @@ void RenderAsyncAfter(uv_work_t *r) {
   delete req;
 
   if (try_catch.HasCaught()) {
-    node::FatalException(try_catch);
+    node::FatalException(MY_NODE_MODULE_ISOLATE, try_catch);
   }
 }
 
@@ -569,19 +570,19 @@ MY_NODE_MODULE_CALLBACK(render)
   REQUIRE_ARGUMENT_OBJECT(iArgs, 0, options);
   OPTIONAL_ARGUMENT_FUNCTION(iArgs, 1, callback);
 
-  if(!options->HasRealNamedProperty(V8_STRING_NEW_UTF8("data"))) {
+  if(options->HasRealNamedProperty(isolate->GetCurrentContext(), V8_STRING_NEW_UTF8("data")).IsNothing()) {
   //if(!Nan::HasOwnProperty(options, V8_STRING_NEW_UTF8("data"))) {
-    RETURN_EXCEPTION_STR_CB("data field is missing", callback);
+    RETURN_EXCEPTION_STR_CB(isolate->GetCurrentContext(), "data field is missing", callback);
   }
 
-  if(!options->HasRealNamedProperty(V8_STRING_NEW_UTF8("outputFormat"))) {
+  if(options->HasRealNamedProperty(isolate->GetCurrentContext(), V8_STRING_NEW_UTF8("outputFormat")).IsNothing()) {
   //if(!Nan::HasOwnProperty(options, V8_STRING_NEW_UTF8("outputFormat"))) {
-    RETURN_EXCEPTION_STR_CB("outputFormat field is missing", callback);
+    RETURN_EXCEPTION_STR_CB(isolate->GetCurrentContext(), "outputFormat field is missing", callback);
   }
 
   MemValueBase<RenderAsyncReq> req;
   req.set(new RenderAsyncReq());
-  v8::String::Utf8Value outputFormatObject(options->Get(V8_STRING_NEW_UTF8("outputFormat"))->ToString());
+  v8::String::Utf8Value outputFormatObject(MY_NODE_MODULE_ISOLATE, options->Get(isolate->GetCurrentContext(), V8_STRING_NEW_UTF8("outputFormat")).ToLocalChecked());
   v8::Local<v8::Object> dataobject = options->Get(V8_STRING_NEW_UTF8("data")).As<v8::Object>();
 
   if(dataobject->IsObject() && dataobject->IsUint8Array())
@@ -590,19 +591,19 @@ MY_NODE_MODULE_CALLBACK(render)
   }
   else
   {
-    RETURN_EXCEPTION_STR_CB("data must be a Buffer", callback);
+    RETURN_EXCEPTION_STR_CB(isolate->GetCurrentContext(), "data must be a Buffer", callback);
   }
 
   req->outputFormat.assign(*outputFormatObject, outputFormatObject.length());
 
-  if(options->HasRealNamedProperty(V8_STRING_NEW_UTF8("scaleFactor"))) {
+  if(options->HasRealNamedProperty(isolate->GetCurrentContext(), V8_STRING_NEW_UTF8("scaleFactor")).IsJust()) {
   //if(!Nan::HasOwnProperty(options, V8_STRING_NEW_UTF8("scaleFactor"))) {
     v8::Local<v8::Value> scaleFactor = options->Get(V8_STRING_NEW_UTF8("scaleFactor")).As<v8::Value>();
     if(!scaleFactor->IsNumber()) {
-      RETURN_EXCEPTION_STR_CB("scaleFactor should be a Number", callback);
+      RETURN_EXCEPTION_STR_CB(isolate->GetCurrentContext(), "scaleFactor should be a Number", callback);
     }
 
-    req->scaleFactor = scaleFactor->NumberValue();
+    req->scaleFactor = scaleFactor->NumberValue(isolate->GetCurrentContext()).FromJust();
   }
 
   if(!callback.IsEmpty()) {
@@ -623,7 +624,7 @@ MY_NODE_MODULE_CALLBACK(render)
   }
 }
 
-void initNode(v8::Handle<v8::Object> exports) {
+void initNode(v8::Local<v8::Object> exports) {
   // Init library
   PdfModule::GetModule();
 
