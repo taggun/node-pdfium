@@ -1,3 +1,9 @@
+# @taggun/node-pdfium
+
+#### Render PDF files in node. Much better support for fonts and less rendering issues than libraries like PDF.js in node.
+
+**node-pdfium** is a fork, updated to support Node 12 LTS. It is used by [TAGGUN to scan receipts and invoicess](https://www.taggun.io).
+
 # node-pdfium-native
 Native port of [PDFium](https://code.google.com/p/pdfium/) to [node.js](https://nodejs.org/), [iojs](https://iojs.org/en/index.html) and [Nw.js](http://nwjs.io/).
 The main motivation of this project is to render/convert a `PDF` format direct into `EMF` format, to be able to print on windows printer by using native [printer module](https://github.com/tojocky/node-printer).

@@ -1,25 +1,25 @@
 {
-  "name": "pdfium",
+  "name": "@taggun/pdfium",
   "description": "Node.js/iojs/node-webkit native pdfium port",
-  "version": "0.0.1",
-  "homepage": "http://github.com/tojocky/node-pdfium",
+  "version": "12.0.1",
+  "homepage": "https://github.com/taggun/node-pdfium",
   "author": {
     "name": "Ion Lupascu",
     "url": "http://lupascu.net",
     "email": "ionlupascu@gmail.com"
   },
   "contributors": [
-    "Name Lastname <email@server.com>"
+    "Michael Arthur <michael@taggun.io>"
   ],
   "repository": {
     "type": "git",
-    "url": "git://github.com/tojocky/node-pdfium-native.git"
+    "url": "git://github.com/taggun/node-pdfium.git"
   },
   "devDependencies": {
     "karma": "^0.12.31"
   },
   "engines": {
-    "node": ">= 0.8.0"
+    "node": ">= 12.14.1"
   },
   "scripts": {},
   "licenses": [
