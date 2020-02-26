@@ -27,5 +27,8 @@
       "type": "BSD"
     }
   ],
-  "main": "./lib/pdfium"
+  "main": "./lib/pdfium",
+  "dependencies": {
+    "nan": "^2.14.0"
+  }
 }
