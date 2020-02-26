@@ -2,7 +2,7 @@
 
 #### Render PDF files in node. Much better support for fonts and less rendering issues than libraries like PDF.js in node.
 
-**node-pdfium** is a fork, updated to support Node 12 LTS. It is used by [TAGGUN to scan receipts and invoicess](https://www.taggun.io).
+**node-pdfium** is a fork, updated to support Node 12 LTS. It is used by [TAGGUN to scan receipts and invoices](https://www.taggun.io).
 
 # node-pdfium-native
 Native port of [PDFium](https://code.google.com/p/pdfium/) to [node.js](https://nodejs.org/), [iojs](https://iojs.org/en/index.html) and [Nw.js](http://nwjs.io/).
